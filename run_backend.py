@@ -15,6 +15,8 @@ if env_path.exists():
     load_dotenv(env_path, override=True)
     print(f"✓ .env 파일 로드됨: {env_path}")
     print(f"  LANGFUSE_HOST: {os.getenv('LANGFUSE_HOST', 'NOT SET')}")
+    print(f"  LANGFUSE_PUBLIC_KEY: {os.getenv('LANGFUSE_PUBLIC_KEY', 'NOT SET')[:20]}...")
+    print(f"  LANGFUSE_SECRET_KEY: {os.getenv('LANGFUSE_SECRET_KEY', 'NOT SET')[:20]}...")
 else:
     print(f"⚠ .env 파일을 찾을 수 없음: {env_path}")
 

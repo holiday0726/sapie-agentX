@@ -293,7 +293,7 @@ export default function NlToFlowPanel() {
     <div className="flex flex-col h-full">
       <SidebarGroup>
         <SidebarGroupContent>
-          <div className="flex flex-col gap-4 px-3 py-4">
+          <div className="flex flex-col gap-4 px-3 pb-4">
             {/* Title and Description */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2 text-sm font-semibold">

@@ -58,6 +58,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "AI Flow Builder",
     tooltip: "Convert natural language to flow",
   },
+  {
+    id: "langfuse_tracing",
+    icon: "activity",
+    label: "Langfuse Tracing",
+    tooltip: "View Langfuse traces",
+  },
 ];
 
 const SidebarSegmentedNav = () => {

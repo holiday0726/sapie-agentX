@@ -44,6 +44,7 @@ import SidebarMenuButtons from "./components/sidebarFooterButtons";
 import { SidebarHeaderComponent } from "./components/sidebarHeader";
 import SidebarSegmentedNav from "./components/sidebarSegmentedNav";
 import NlToFlowPanel from "./components/nlToFlowPanel";
+import LangfuseTracingPanel from "./components/langfuseTracingPanel";
 import { applyBetaFilter } from "./helpers/apply-beta-filter";
 import { applyComponentFilter } from "./helpers/apply-component-filter";
 import { applyEdgeFilter } from "./helpers/apply-edge-filter";
@@ -542,6 +543,7 @@ export function FlowSidebarComponent({ isLoading }: FlowSidebarComponentProps) {
     (ENABLE_NEW_SIDEBAR && activeSection === "mcp") ||
     (hasSearchInput && hasMcpComponents && ENABLE_NEW_SIDEBAR);
   const showNlToFlow = ENABLE_NEW_SIDEBAR && activeSection === "nl_to_flow";
+  const showLangfuseTracing = ENABLE_NEW_SIDEBAR && activeSection === "langfuse_tracing";
 
   const [category, component] = getFilterComponent?.split(".") ?? ["", ""];
 
@@ -604,6 +606,8 @@ export function FlowSidebarComponent({ isLoading }: FlowSidebarComponentProps) {
           >
             {showNlToFlow ? (
               <NlToFlowPanel />
+            ) : showLangfuseTracing ? (
+              <LangfuseTracingPanel />
             ) : isLoading ? (
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1 p-3">
@@ -704,7 +708,8 @@ export function FlowSidebarComponent({ isLoading }: FlowSidebarComponentProps) {
           </SidebarContent>
           {ENABLE_NEW_SIDEBAR &&
           (activeSection === "mcp" && !hasMcpServers ||
-            activeSection === "nl_to_flow") ? null : (
+            activeSection === "nl_to_flow" ||
+            activeSection === "langfuse_tracing") ? null : (
             <SidebarFooter className="border-t group-data-[collapsible=icon]:hidden p-1 gap-1">
               <SidebarMenuButtons
                 customComponent={customComponent}

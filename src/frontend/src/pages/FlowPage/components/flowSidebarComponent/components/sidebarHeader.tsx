@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/disclosure";
 import { SidebarHeader, SidebarTrigger } from "@/components/ui/sidebar";
 import { ENABLE_NEW_SIDEBAR } from "@/customization/feature-flags";
+import { cn } from "@/utils/utils";
 import type { SidebarHeaderComponentProps } from "../types";
 import FeatureToggles from "./featureTogglesComponent";
 import { SearchInput } from "./searchInput";
@@ -33,10 +34,14 @@ export const SidebarHeaderComponent = memo(function SidebarHeaderComponent({
   resetFilters,
   activeSection,
 }: SidebarHeaderComponentProps) {
-  const showSearchInput = activeSection !== "nl_to_flow";
+  const showSearchInput = activeSection !== "nl_to_flow" && activeSection !== "langfuse_tracing";
+  const showBorder = showSearchInput || !ENABLE_NEW_SIDEBAR;
 
   return (
-    <SidebarHeader className="flex w-full flex-col gap-2 group-data-[collapsible=icon]:hidden border-b">
+    <SidebarHeader className={cn(
+      "flex w-full flex-col gap-2 group-data-[collapsible=icon]:hidden",
+      showBorder && "border-b"
+    )}>
       {!ENABLE_NEW_SIDEBAR && (
         <Disclosure open={showConfig} onOpenChange={setShowConfig}>
           <div className="flex w-full items-center gap-2">
