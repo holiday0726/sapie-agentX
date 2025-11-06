@@ -28,6 +28,39 @@ from langflow.services.database.models.user.model import UserRead
 from langflow.services.tracing.schema import Log
 
 
+class NLToFlowRequest(BaseModel):
+    """Request schema for natural language to flow generation."""
+
+    prompt: str = Field(..., description="Natural language description of the flow to create")
+
+
+class FlowNodeData(BaseModel):
+    """Schema for a flow node in the generated flow."""
+
+    id: str = Field(..., description="Unique ID for the node")
+    component_name: str = Field(..., description="Name of the component to use")
+    display_name: str | None = Field(None, description="Display name for the node")
+    position: dict[str, float] = Field(default_factory=lambda: {"x": 0, "y": 0})
+    data: dict[str, Any] = Field(default_factory=dict, description="Node configuration data")
+
+
+class FlowEdgeData(BaseModel):
+    """Schema for a flow edge in the generated flow."""
+
+    source: str = Field(..., description="Source node ID")
+    target: str = Field(..., description="Target node ID")
+    source_handle: str | None = Field(None, description="Source handle/output field")
+    target_handle: str | None = Field(None, description="Target handle/input field")
+
+
+class NLToFlowResponse(BaseModel):
+    """Response schema for natural language to flow generation."""
+
+    nodes: list[FlowNodeData] = Field(default_factory=list)
+    edges: list[FlowEdgeData] = Field(default_factory=list)
+    explanation: str | None = Field(None, description="Explanation of the generated flow")
+
+
 class BuildStatus(Enum):
     """Status of the build."""
 

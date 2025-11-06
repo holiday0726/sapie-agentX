@@ -73,7 +73,7 @@ class LangFuseTracer(BaseTracer):
             return False
 
         except Exception as e:  # noqa: BLE001
-            logger.debug(f"Error setting up LangSmith tracer: {e}")
+            logger.debug(f"Error setting up Langfuse tracer: {e}")
             return False
 
         return True
