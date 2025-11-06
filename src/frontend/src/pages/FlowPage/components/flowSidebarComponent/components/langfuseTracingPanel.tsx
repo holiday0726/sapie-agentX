@@ -10,6 +10,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
   SidebarGroup,
   SidebarGroupContent,
 } from "@/components/ui/sidebar";
@@ -53,6 +59,91 @@ export default function LangfuseTracingPanel() {
 
   const handleCloseModal = () => {
     setSelectedTraceId(null);
+  };
+
+  const handleCopyJson = (data: any) => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+  };
+
+  const calculateDuration = (obj: any): string | null => {
+    if (obj && typeof obj === "object" && obj.startTime && obj.endTime) {
+      try {
+        const start = new Date(obj.startTime).getTime();
+        const end = new Date(obj.endTime).getTime();
+        const duration = end - start;
+
+        if (duration < 1000) {
+          return `${duration}ms`;
+        } else {
+          return `${(duration / 1000).toFixed(2)}s`;
+        }
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const renderJsonValue = (value: any, depth: number = 0): React.ReactNode => {
+    if (value === null || value === undefined) {
+      return <span className="text-muted-foreground italic">null</span>;
+    }
+    if (typeof value === "boolean") {
+      return <span className="text-foreground">{String(value)}</span>;
+    }
+    if (typeof value === "number") {
+      return <span className="text-foreground">{value}</span>;
+    }
+    if (typeof value === "string") {
+      return <span className="text-muted-foreground break-all">"{value}"</span>;
+    }
+    if (Array.isArray(value)) {
+      return (
+        <div className="ml-4 space-y-1">
+          {value.map((item, idx) => (
+            <div key={idx} className="flex flex-col gap-1">
+              <span className="text-muted-foreground text-xs">[{idx}]</span>
+              <div className="ml-2">{renderJsonValue(item, depth + 1)}</div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    if (typeof value === "object") {
+      const entries = Object.entries(value);
+      return (
+        <div className={depth === 0 ? "space-y-3" : "ml-4 space-y-2"}>
+          {entries.map(([key, val]) => {
+            const duration = depth === 0 ? calculateDuration(val) : null;
+            return (
+              <div
+                key={key}
+                className={depth === 0 ? "bg-muted/50 p-3 rounded-md border border-border/50 relative" : "flex flex-col gap-1"}
+              >
+                {depth === 0 ? (
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span className="text-foreground font-semibold text-base break-all">
+                      {key}
+                    </span>
+                    {duration && (
+                      <span className="text-muted-foreground text-xs font-mono whitespace-nowrap">
+                        {duration}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-foreground font-medium break-all">
+                    {key}:
+                  </span>
+                )}
+                <div className={depth === 0 ? "" : "ml-2"}>{renderJsonValue(val, depth + 1)}</div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+    return String(value);
   };
 
   const formatCost = (cost: number | null) => {
@@ -185,7 +276,7 @@ export default function LangfuseTracingPanel() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {traces.map((trace) => (
+                    {traces.map((trace: any) => (
                       <Card
                         key={trace.id}
                         className="overflow-hidden cursor-pointer hover:bg-accent transition-colors"
@@ -273,99 +364,129 @@ export default function LangfuseTracingPanel() {
                 />
               </div>
             ) : traceDetail ? (
-              <div className="flex flex-col gap-6">
-              {/* Basic Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">
-                    Trace ID
-                  </div>
-                  <div className="text-sm font-mono bg-muted p-2 rounded">
-                    {traceDetail.id}
+              <div className="flex flex-col gap-4">
+                {/* Basic Info */}
+                <div className="bg-muted/30 p-4 rounded-lg space-y-3 text-sm">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-muted-foreground">ID:</span>
+                      <span className="ml-2 font-mono">{traceDetail.id}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Name:</span>
+                      <span className="ml-2 font-medium">{traceDetail.name || "Unnamed"}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Timestamp:</span>
+                      <span className="ml-2">
+                        {new Date(traceDetail.timestamp).toLocaleString("ko-KR")}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Cost:</span>
+                      <span className="ml-2 font-mono">{formatCost(traceDetail.total_cost)}</span>
+                    </div>
+                    {traceDetail.user_id && (
+                      <div>
+                        <span className="text-muted-foreground">User ID:</span>
+                        <span className="ml-2 font-mono">{traceDetail.user_id}</span>
+                      </div>
+                    )}
+                    {traceDetail.session_id && (
+                      <div>
+                        <span className="text-muted-foreground">Session ID:</span>
+                        <span className="ml-2 font-mono">{traceDetail.session_id}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">
-                    Name
-                  </div>
-                  <div className="text-sm font-medium p-2">
-                    {traceDetail.name || "Unnamed Trace"}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">
-                    Timestamp
-                  </div>
-                  <div className="text-sm p-2">
-                    {new Date(traceDetail.timestamp).toLocaleString("ko-KR")}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">
-                    Total Cost
-                  </div>
-                  <div className="text-sm font-mono p-2">
-                    {formatCost(traceDetail.total_cost)}
-                  </div>
-                </div>
-                {traceDetail.user_id && (
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground mb-1">
-                      User ID
-                    </div>
-                    <div className="text-sm font-mono p-2">
-                      {traceDetail.user_id}
-                    </div>
-                  </div>
-                )}
-                {traceDetail.session_id && (
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground mb-1">
-                      Session ID
-                    </div>
-                    <div className="text-sm font-mono p-2">
-                      {traceDetail.session_id}
-                    </div>
-                  </div>
-                )}
-              </div>
 
-              {/* Input */}
-              {traceDetail.input && (
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-2">
-                    Input
-                  </div>
-                  <pre className="text-xs bg-muted p-4 rounded overflow-x-auto">
-                    {JSON.stringify(traceDetail.input, null, 2)}
-                  </pre>
-                </div>
-              )}
-
-              {/* Output */}
-              {traceDetail.output && (
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-2">
-                    Output
-                  </div>
-                  <pre className="text-xs bg-muted p-4 rounded overflow-x-auto">
-                    {JSON.stringify(traceDetail.output, null, 2)}
-                  </pre>
-                </div>
-              )}
-
-              {/* Metadata */}
-              {traceDetail.metadata &&
-                Object.keys(traceDetail.metadata).length > 0 && (
-                  <div>
-                    <div className="text-sm font-medium text-muted-foreground mb-2">
+                {/* Tabs for Input/Output/Metadata */}
+                <Tabs defaultValue="input" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="input" className="gap-2">
+                      <ForwardedIconComponent name="arrow-down-to-line" className="h-3.5 w-3.5" />
+                      Input
+                    </TabsTrigger>
+                    <TabsTrigger value="output" className="gap-2">
+                      <ForwardedIconComponent name="arrow-up-from-line" className="h-3.5 w-3.5" />
+                      Output
+                    </TabsTrigger>
+                    <TabsTrigger value="metadata" className="gap-2">
+                      <ForwardedIconComponent name="info" className="h-3.5 w-3.5" />
                       Metadata
-                    </div>
-                    <pre className="text-xs bg-muted p-4 rounded overflow-x-auto">
-                      {JSON.stringify(traceDetail.metadata, null, 2)}
-                    </pre>
-                  </div>
-                )}
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="input" className="mt-4">
+                    {traceDetail.input ? (
+                      <div className="relative group">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleCopyJson(traceDetail.input)}
+                        >
+                          <ForwardedIconComponent name="copy" className="h-4 w-4" />
+                        </Button>
+                        <div className="bg-muted/30 p-4 rounded-lg border border-border text-sm">
+                          {renderJsonValue(traceDetail.input)}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground text-sm">
+                        <ForwardedIconComponent name="inbox" className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        Input 데이터가 없습니다
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="output" className="mt-4">
+                    {traceDetail.output ? (
+                      <div className="relative group">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleCopyJson(traceDetail.output)}
+                        >
+                          <ForwardedIconComponent name="copy" className="h-4 w-4" />
+                        </Button>
+                        <div className="bg-muted/30 p-4 rounded-lg border border-border text-sm">
+                          {renderJsonValue(traceDetail.output)}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground text-sm">
+                        <ForwardedIconComponent name="inbox" className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        Output 데이터가 없습니다
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="metadata" className="mt-4">
+                    {traceDetail.metadata && Object.keys(traceDetail.metadata).length > 0 ? (
+                      <div className="relative group">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleCopyJson(traceDetail.metadata)}
+                        >
+                          <ForwardedIconComponent name="copy" className="h-4 w-4" />
+                        </Button>
+                        <div className="bg-muted/30 p-4 rounded-lg border border-border text-sm">
+                          {renderJsonValue(traceDetail.metadata)}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground text-sm">
+                        <ForwardedIconComponent name="inbox" className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        Metadata가 없습니다
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </div>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
