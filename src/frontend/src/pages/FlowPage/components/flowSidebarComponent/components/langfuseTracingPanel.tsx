@@ -369,14 +369,6 @@ export default function LangfuseTracingPanel() {
                 <div className="bg-muted/30 p-4 rounded-lg space-y-3 text-sm">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <span className="text-muted-foreground">ID:</span>
-                      <span className="ml-2 font-mono">{traceDetail.id}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Name:</span>
-                      <span className="ml-2 font-medium">{traceDetail.name || "Unnamed"}</span>
-                    </div>
-                    <div>
                       <span className="text-muted-foreground">Timestamp:</span>
                       <span className="ml-2">
                         {new Date(traceDetail.timestamp).toLocaleString("ko-KR")}
@@ -386,10 +378,14 @@ export default function LangfuseTracingPanel() {
                       <span className="text-muted-foreground">Cost:</span>
                       <span className="ml-2 font-mono">{formatCost(traceDetail.total_cost)}</span>
                     </div>
-                    {traceDetail.user_id && (
+                    {traceDetail.metadata?.time_elapsed && (
                       <div>
-                        <span className="text-muted-foreground">User ID:</span>
-                        <span className="ml-2 font-mono">{traceDetail.user_id}</span>
+                        <span className="text-muted-foreground">time elapsed:</span>
+                        <span className="ml-2 font-mono">
+                          {typeof traceDetail.metadata.time_elapsed === 'number'
+                            ? `${traceDetail.metadata.time_elapsed.toFixed(2)}s`
+                            : traceDetail.metadata.time_elapsed}
+                        </span>
                       </div>
                     )}
                     {traceDetail.session_id && (
@@ -465,26 +461,57 @@ export default function LangfuseTracingPanel() {
                   </TabsContent>
 
                   <TabsContent value="metadata" className="mt-4">
-                    {traceDetail.metadata && Object.keys(traceDetail.metadata).length > 0 ? (
-                      <div className="relative group">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleCopyJson(traceDetail.metadata)}
-                        >
-                          <ForwardedIconComponent name="copy" className="h-4 w-4" />
-                        </Button>
-                        <div className="bg-muted/30 p-4 rounded-lg border border-border text-sm">
-                          {renderJsonValue(traceDetail.metadata)}
+                    <div className="relative group">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleCopyJson({
+                          id: traceDetail.id,
+                          name: traceDetail.name,
+                          user_id: traceDetail.user_id,
+                          ...traceDetail.metadata
+                        })}
+                      >
+                        <ForwardedIconComponent name="copy" className="h-4 w-4" />
+                      </Button>
+                      <div className="bg-muted/30 p-4 rounded-lg border border-border text-sm space-y-3">
+                        {/* ID */}
+                        <div className="bg-muted/50 p-3 rounded-md border border-border/50">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-foreground font-medium">ID:</span>
+                              <span className="ml-2 font-mono text-muted-foreground break-all">{traceDetail.id}</span>
+                            </div>
                         </div>
+
+                        {/* Name */}
+                        <div className="bg-muted/50 p-3 rounded-md border border-border/50">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-foreground font-medium">Name:</span>
+                              <span className="ml-2 text-muted-foreground break-all">{traceDetail.name || "Unnamed"}</span>
+                            </div>
+                        </div>
+
+                        {/* User ID */}
+                        {traceDetail.user_id && (
+                          <div className="bg-muted/50 p-3 rounded-md border border-border/50">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-foreground font-medium">User ID:</span>
+                              <span className="ml-2 font-mono text-muted-foreground break-all">{traceDetail.user_id}</span>
+                          </div>
+                        </div>
+                        )}
+
+                        {/* Other Metadata */}
+                        {traceDetail.metadata && Object.keys(traceDetail.metadata).length > 0 ? (
+                          renderJsonValue(traceDetail.metadata)
+                        ) : (
+                          <div className="text-center py-4 text-muted-foreground text-sm">
+                            추가 메타데이터가 없습니다
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground text-sm">
-                        <ForwardedIconComponent name="inbox" className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                        Metadata가 없습니다
-                      </div>
-                    )}
+                    </div>
                   </TabsContent>
                 </Tabs>
               </div>
