@@ -52,7 +52,7 @@ sapie-agentX는 [Langflow](https://langflow.org)의 강력한 비주얼 워크�
 - 점수 기반 컴포넌트 검색 알고리즘
 - 향상된 메타데이터 관리
 
-## ⚡️ 빠른 시작
+## 빠른 시작
 
 ### 사전 요구사항
 
@@ -106,37 +106,9 @@ langflow run
 
 서버가 http://127.0.0.1:7860 에서 시작됩니다.
 
-## 📚 상세 가이드
 
-### 🤖 자연어 기반 플로우 생성
 
-자연어 설명으로 플로우를 자동 생성하는 방법:
-
-- **[NL to Flow 완전 가이드](./document/NL_TO_FLOW_COMPLETE_GUIDE.md)**
-  - 빠른 시작 및 설정
-  - 아키텍처 및 데이터 흐름
-  - 백엔드 및 프론트엔드 구현 상세
-  - 컴포넌트 검색 강화 (Keywords 시스템)
-  - System Prompt Fallback 전략
-  - 테스트 및 문제 해결
-
-**주요 개선사항:**
-- VALID_EXTENSIONS 기반 키워드 자동 생성 (예: PDF → "PDF loader", "PDF reader")
-- 점수 기반 검색 알고리즘 (Exact match: 100점, Keywords: 40점 등)
-- LLM Fallback 전략으로 대안 컴포넌트 자동 제안
-
-### 📊 Langfuse 트레이싱
-
-LLM 애플리케이션 실행 추적 및 모니터링:
-
-- **[Langfuse 트레이싱 가이드](./document/LANGFUSE_TRACING_GUIDE.md)**
-  - 환경 설정
-  - Langflow 통합
-  - 실시간 트레이스 모니터링
-  - 비용 및 성능 추적
-  - 커스텀 UI 패널 사용법
-
-## 🏗️ 프로젝트 구조
+## 프로젝트 구조
 
 ```
 sapie-agentX/
@@ -168,86 +140,3 @@ sapie-agentX/
     ├── NL_TO_FLOW_COMPLETE_GUIDE.md
     └── LANGFUSE_TRACING_GUIDE.md
 ```
-
-## 🔧 개발
-
-### 개발 환경 설정
-
-개발 또는 소스에서 실행하는 경우 [DEVELOPMENT.md](./DEVELOPMENT.md)를 참조하세요.
-
-### 주요 개발 사항
-
-#### 백엔드
-- **컴포넌트 검색 강화**: `component_metadata.py`에 VALID_EXTENSIONS 기반 키워드 시스템
-- **점수 기반 검색**: `service.py`의 `_search_components` 개선
-- **System Prompt 개선**: Fallback 전략 및 대안 제안 로직
-
-#### 프론트엔드
-- **NL to Flow Panel**: 자연어 입력 UI 및 플로우 변환 로직
-- **Langfuse Panel**: 트레이스 목록, 상세 정보, JSON 렌더링
-
-## 📦 배포
-
-sapie-agentX는 완전히 오픈소스이며, 모든 주요 클라우드에 배포할 수 있습니다.
-
-- Docker 배포는 [Langflow Docker 가이드](https://docs.langflow.org/deployment-docker) 참조
-- 환경 변수 설정을 잊지 마세요 (OPENAI_API_KEY, LANGFUSE_*)
-
-## 🧪 테스트
-
-### NL to Flow 테스트
-
-```bash
-# 서버 실행
-make run
-
-# 브라우저에서 http://127.0.0.1:7860 접속
-# 사이드바에서 "AI Flow Builder" 찾기
-# 테스트 프롬프트 입력:
-#   - "간단한 챗봇 만들어줘"
-#   - "PDF 파일을 읽고 질문에 답변하는 RAG 시스템 만들어줘"
-```
-
-### Langfuse 트레이싱 테스트
-
-```bash
-# 환경 변수 설정 확인
-echo $LANGFUSE_SECRET_KEY
-echo $LANGFUSE_PUBLIC_KEY
-
-# 플로우 실행 후 사이드바에서 "Langfuse Tracing" 패널 확인
-```
-
-## 🐛 문제 해결
-
-### NL to Flow 관련
-- **문제**: LLM이 플로우를 생성하지 않음
-- **해결**: 
-  - OPENAI_API_KEY 확인
-  - 서버 재시작
-  - 로그 확인 (`logs/langflow.log`)
-
-### Langfuse 관련
-- **문제**: "연결 안됨" 표시
-- **해결**:
-  - LANGFUSE_* 환경 변수 확인
-  - API 키 유효성 확인
-  - 네트워크 연결 확인
-
-자세한 내용은 각 가이드의 "트러블슈팅" 섹션을 참조하세요.
-
-## 📄 라이선스
-
-MIT License - [LICENSE](./LICENSE) 참조
-
-## 🙏 감사의 말
-
-이 프로젝트는 [Langflow](https://github.com/langflow-ai/langflow)를 기반으로 합니다. Langflow 팀과 커뮤니티에 감사드립니다.
-
-## 📞 문의
-
-프로젝트에 대한 질문이나 제안이 있으시면 이슈를 열어주세요.
-
----
-
-**Built with ❤️ on top of [Langflow](https://langflow.org)**
