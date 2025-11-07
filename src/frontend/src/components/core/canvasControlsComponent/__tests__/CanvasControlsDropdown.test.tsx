@@ -116,7 +116,7 @@ describe("CanvasControlsDropdown", () => {
 
     // Should have one of the chevron icons (the actual logic depends on internal state)
     const chevronUp = screen.queryByTestId("icon-ChevronUp");
-    // const chevronDown = screen.queryByTestId("icon-ChevronDown");
+    const chevronDown = screen.queryByTestId("icon-ChevronDown");
 
     expect(chevronUp || chevronDown).toBeInTheDocument();
   });

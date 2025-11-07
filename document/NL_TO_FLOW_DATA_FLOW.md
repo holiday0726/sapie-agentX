@@ -14,7 +14,7 @@ API Request (POST /api/v1/nl-flow/generate)
 Backend (nl_flow.py + service.py)
     ↓ LLM Function Calling
 OpenAI GPT-4
-    ↓
+    ↓ 
 Backend Response
     ↓
 Frontend Processing
